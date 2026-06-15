@@ -177,7 +177,6 @@ export function ZoneBGrounding({ onGenerate }: { onGenerate: () => void }) {
     }
   }
 
-  const tokenProgressPercent = Math.min(100, (dailyTokenUsage / DAILY_BUDGET) * 100)
 
   if (requestMode !== 'brand-product-package') {
     return (
