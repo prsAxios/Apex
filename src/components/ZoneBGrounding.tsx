@@ -71,9 +71,6 @@ export function ZoneBGrounding({ onGenerate }: { onGenerate: () => void }) {
               ]
             }
           ],
-          generationConfig: {
-            responseMimeType: "application/json"
-          },
           tools: [
             {
               googleSearch: {}
@@ -107,10 +104,15 @@ export function ZoneBGrounding({ onGenerate }: { onGenerate: () => void }) {
       const candidates = resJson.usageMetadata?.candidatesTokenCount || 0
       addTokenUsage(prompt, candidates)
 
-      // Parse JSON
+      // Parse JSON (strip markdown code block wrappers if any are present)
+      let cleanedText = responseText.trim()
+      if (cleanedText.startsWith('```')) {
+        cleanedText = cleanedText.replace(/^```(?:json)?\n?/, '').replace(/\n?```$/, '')
+      }
+      
       let data: { items: Array<{ raw_description: string, brand: string, product_name: string, package_size: string, confidence: 'high' | 'medium' | 'low', source?: string }> }
       try {
-        data = JSON.parse(responseText.trim())
+        data = JSON.parse(cleanedText)
       } catch {
         throw new Error('Failed to parse Gemini output as JSON.')
       }
