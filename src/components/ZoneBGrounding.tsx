@@ -10,6 +10,7 @@ export function ZoneBGrounding({ onGenerate }: { onGenerate: () => void }) {
   const lastTokenUsage = useStore(s => s.lastTokenUsage)
   const lifetimeTokensUsed = useStore(s => s.lifetimeTokensUsed)
   const dailyTokenUsage = useStore(s => s.dailyTokenUsage)
+  const dailyRequestsCount = useStore(s => s.dailyRequestsCount)
   const addTokenUsage = useStore(s => s.addTokenUsage)
 
   const requestMode = useStore(s => s.requestMode)
@@ -23,8 +24,10 @@ export function ZoneBGrounding({ onGenerate }: { onGenerate: () => void }) {
   const [statusText, setStatusText] = useState('')
   const [errorText, setErrorText] = useState<string | null>(null)
   
-  const DAILY_BUDGET = 500000
-  const remainingTokens = Math.max(0, DAILY_BUDGET - dailyTokenUsage)
+  const DAILY_REQUEST_LIMIT = 1500
+  const TPM_LIMIT = 1000000
+  
+  const dailyRequestsRemaining = Math.max(0, DAILY_REQUEST_LIMIT - dailyRequestsCount)
 
   function canonicalize(brand: string): string {
     const match = fuzzyResolveAlias(brand, dictionary)
@@ -306,9 +309,7 @@ export function ZoneBGrounding({ onGenerate }: { onGenerate: () => void }) {
         }}>
           {errorText}
         </div>
-      )}
-
-      {/* Token Usage Stats Panel */}
+      )}      {/* Gemini API Limits Tracker */}
       <div style={{
         background: 'var(--surface2)',
         border: '1px solid var(--hairline2)',
@@ -316,40 +317,55 @@ export function ZoneBGrounding({ onGenerate }: { onGenerate: () => void }) {
         padding: '12px 14px',
         display: 'flex',
         flexDirection: 'column',
-        gap: 10,
+        gap: 12,
       }}>
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
           <span style={{ fontSize: 11, fontWeight: 600, color: 'var(--text-dim)', textTransform: 'uppercase', letterSpacing: '0.04em' }}>
-            Token Usage Tracking
-          </span>
-          <span style={{ fontSize: 11, color: 'var(--text-muted)' }}>
-            Daily Budget: {DAILY_BUDGET.toLocaleString()}
+            Gemini API Limits (Free Tier)
           </span>
         </div>
 
-        {/* Progress Bar */}
-        <div style={{ width: '100%', height: 6, background: 'var(--surface3)', borderRadius: 3, overflow: 'hidden' }}>
-          <div style={{
-            width: `${tokenProgressPercent}%`,
-            height: '100%',
-            background: tokenProgressPercent > 90 ? 'var(--red-flag)' : tokenProgressPercent > 60 ? 'var(--amber-flag)' : 'var(--text)',
-            borderRadius: 3,
-            transition: 'width 0.3s ease-out',
-          }} />
-        </div>
-
-        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12 }}>
-          <div>
-            <div style={{ fontSize: 10, color: 'var(--text-muted)', textTransform: 'uppercase' }}>Daily Used</div>
-            <div style={{ fontSize: 13, fontWeight: 600, color: 'var(--text)', marginTop: 2 }}>
-              {dailyTokenUsage.toLocaleString()}
-            </div>
+        {/* 1. Daily Requests Tracker (1,500 limit) */}
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
+          <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 10.5 }}>
+            <span style={{ color: 'var(--text-dim)' }}>Daily Requests (1,500 RPD limit)</span>
+            <span style={{ fontWeight: 600, color: 'var(--text)' }}>
+              {dailyRequestsCount.toLocaleString()} / {DAILY_REQUEST_LIMIT.toLocaleString()}
+            </span>
           </div>
-          <div>
-            <div style={{ fontSize: 10, color: 'var(--text-muted)', textTransform: 'uppercase' }}>Pending / Remaining</div>
-            <div style={{ fontSize: 13, fontWeight: 600, color: remainingTokens > 0 ? 'var(--text)' : 'var(--red-flag)', marginTop: 2 }}>
-              {remainingTokens.toLocaleString()}
-            </div>
+          <div style={{ width: '100%', height: 6, background: 'var(--surface3)', borderRadius: 3, overflow: 'hidden' }}>
+            <div style={{
+              width: `${Math.min(100, (dailyRequestsCount / DAILY_REQUEST_LIMIT) * 100)}%`,
+              height: '100%',
+              background: 'var(--text)',
+              borderRadius: 3,
+              transition: 'width 0.3s ease-out',
+            }} />
+          </div>
+          <div style={{ fontSize: 9.5, color: 'var(--text-muted)', textAlign: 'right' }}>
+            {dailyRequestsRemaining.toLocaleString()} requests remaining today
+          </div>
+        </div>
+
+        {/* 2. Tokens Per Minute Tracker (1,000,000 limit) */}
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
+          <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 10.5 }}>
+            <span style={{ color: 'var(--text-dim)' }}>Tokens Per Minute (1M TPM limit)</span>
+            <span style={{ fontWeight: 600, color: 'var(--text)' }}>
+              {(lastTokenUsage?.total || 0).toLocaleString()} / {TPM_LIMIT.toLocaleString()}
+            </span>
+          </div>
+          <div style={{ width: '100%', height: 6, background: 'var(--surface3)', borderRadius: 3, overflow: 'hidden' }}>
+            <div style={{
+              width: `${Math.min(100, ((lastTokenUsage?.total || 0) / TPM_LIMIT) * 100)}%`,
+              height: '100%',
+              background: 'var(--text)',
+              borderRadius: 3,
+              transition: 'width 0.3s ease-out',
+            }} />
+          </div>
+          <div style={{ fontSize: 9.5, color: 'var(--text-muted)', textAlign: 'right' }}>
+            Last call used {((lastTokenUsage?.total || 0) / TPM_LIMIT * 100).toFixed(3)}% of minute capacity
           </div>
         </div>
 
@@ -363,9 +379,9 @@ export function ZoneBGrounding({ onGenerate }: { onGenerate: () => void }) {
             fontSize: 11,
             color: 'var(--text-dim)'
           }}>
-            <span>Last Request: {lastTokenUsage.total.toLocaleString()} tokens</span>
+            <span>Last Request Details:</span>
             <span style={{ color: 'var(--text-muted)' }}>
-              ({lastTokenUsage.prompt} prompt, {lastTokenUsage.candidates} response)
+              {lastTokenUsage.prompt} prompt / {lastTokenUsage.candidates} response
             </span>
           </div>
         ) : null}
@@ -378,7 +394,7 @@ export function ZoneBGrounding({ onGenerate }: { onGenerate: () => void }) {
           fontSize: 11,
           color: 'var(--text-muted)'
         }}>
-          <span>Lifetime usage:</span>
+          <span>Lifetime Token consumption:</span>
           <strong style={{ color: 'var(--text-dim)' }}>{lifetimeTokensUsed.toLocaleString()} tokens</strong>
         </div>
       </div>

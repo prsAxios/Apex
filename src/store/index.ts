@@ -51,6 +51,7 @@ export interface AppState {
   lastTokenUsage: { prompt: number; candidates: number; total: number } | null
   lifetimeTokensUsed: number
   dailyTokenUsage: number
+  dailyRequestsCount: number
   lastUsageResetDate: string
 
   // Toast
@@ -137,6 +138,7 @@ export const useStore = create<AppState>()(
       lastTokenUsage: null,
       lifetimeTokensUsed: 0,
       dailyTokenUsage: 0,
+      dailyRequestsCount: 0,
       lastUsageResetDate: new Date().toDateString(),
 
       emailOpening: 'Hi Team,',
@@ -257,9 +259,11 @@ export const useStore = create<AppState>()(
         const todayStr = new Date().toDateString()
         const currentResetDate = get().lastUsageResetDate
         let dailyUsage = get().dailyTokenUsage
+        let dailyReqs = get().dailyRequestsCount
         
         if (currentResetDate !== todayStr) {
           dailyUsage = 0
+          dailyReqs = 0
         }
         
         const added = prompt + candidates
@@ -267,6 +271,7 @@ export const useStore = create<AppState>()(
           lastTokenUsage: { prompt, candidates, total: added },
           lifetimeTokensUsed: get().lifetimeTokensUsed + added,
           dailyTokenUsage: dailyUsage + added,
+          dailyRequestsCount: dailyReqs + 1,
           lastUsageResetDate: todayStr
         })
       },
@@ -315,6 +320,7 @@ export const useStore = create<AppState>()(
         lastTokenUsage: s.lastTokenUsage,
         lifetimeTokensUsed: s.lifetimeTokensUsed,
         dailyTokenUsage: s.dailyTokenUsage,
+        dailyRequestsCount: s.dailyRequestsCount,
         lastUsageResetDate: s.lastUsageResetDate,
       }),
     }
