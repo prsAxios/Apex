@@ -150,14 +150,21 @@ export function ZoneB({ onGenerate }: { onGenerate: () => void }) {
               resize: 'vertical',
               background: 'var(--surface2)',
               border: '1px solid var(--hairline2)',
-              borderRadius: 4,
+              borderRadius: 6,
               color: 'var(--text)',
               padding: '10px',
               outline: 'none',
               lineHeight: 1.6,
+              transition: 'border-color 0.15s, box-shadow 0.15s',
             }}
-            onFocus={e => (e.currentTarget.style.borderColor = 'var(--accent)')}
-            onBlur={e => (e.currentTarget.style.borderColor = 'var(--hairline2)')}
+            onFocus={e => {
+              e.currentTarget.style.borderColor = 'var(--accent)'
+              e.currentTarget.style.boxShadow = '0 0 0 1px var(--accent)'
+            }}
+            onBlur={e => {
+              e.currentTarget.style.borderColor = 'var(--hairline2)'
+              e.currentTarget.style.boxShadow = 'none'
+            }}
           />
         </div>
       ) : (
@@ -200,15 +207,22 @@ export function ZoneB({ onGenerate }: { onGenerate: () => void }) {
                       width: '100%',
                       marginBottom: 8,
                       background: 'var(--surface)',
-                      border: '1px solid var(--hairline)',
-                      borderRadius: 4,
+                      border: '1px solid var(--hairline2)',
+                      borderRadius: 6,
                       color: 'var(--text)',
-                      padding: '7px 10px',
+                      padding: '8px 12px',
                       fontSize: 13,
                       outline: 'none',
+                      transition: 'border-color 0.15s, box-shadow 0.15s',
                     }}
-                    onFocus={e => (e.currentTarget.style.borderColor = 'var(--accent)')}
-                    onBlur={e => (e.currentTarget.style.borderColor = 'var(--hairline)')}
+                    onFocus={e => {
+                      e.currentTarget.style.borderColor = 'var(--accent)'
+                      e.currentTarget.style.boxShadow = '0 0 0 1px var(--accent)'
+                    }}
+                    onBlur={e => {
+                      e.currentTarget.style.borderColor = 'var(--hairline2)'
+                      e.currentTarget.style.boxShadow = 'none'
+                    }}
                   />
                 )}
                 <textarea
@@ -227,15 +241,22 @@ export function ZoneB({ onGenerate }: { onGenerate: () => void }) {
                     width: '100%',
                     resize: 'vertical',
                     background: 'var(--surface)',
-                    border: '1px solid var(--hairline)',
-                    borderRadius: 4,
+                    border: '1px solid var(--hairline2)',
+                    borderRadius: 6,
                     color: 'var(--text)',
-                    padding: '8px',
+                    padding: '10px',
                     outline: 'none',
                     lineHeight: 1.6,
+                    transition: 'border-color 0.15s, box-shadow 0.15s',
                   }}
-                  onFocus={e => (e.currentTarget.style.borderColor = 'var(--accent)')}
-                  onBlur={e => (e.currentTarget.style.borderColor = 'var(--hairline)')}
+                  onFocus={e => {
+                    e.currentTarget.style.borderColor = 'var(--accent)'
+                    e.currentTarget.style.boxShadow = '0 0 0 1px var(--accent)'
+                  }}
+                  onBlur={e => {
+                    e.currentTarget.style.borderColor = 'var(--hairline2)'
+                    e.currentTarget.style.boxShadow = 'none'
+                  }}
                 />
               </motion.div>
             ))}

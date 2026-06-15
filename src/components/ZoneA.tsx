@@ -49,10 +49,10 @@ export function ZoneA() {
       <div className="zone-label" style={{ marginBottom: -8 }}>Request Setup</div>
 
       <div>
-        <label style={{ display: 'block', fontSize: 11, color: 'var(--text-dim)', marginBottom: 6, letterSpacing: '0.05em', textTransform: 'uppercase' }}>
+        <label style={{ display: 'block', fontSize: 10, fontWeight: 600, color: 'var(--text-muted)', marginBottom: 8, letterSpacing: '0.08em', textTransform: 'uppercase' }}>
           Request Type
         </label>
-        <div style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
           {MODE_OPTIONS.map(opt => {
             const active = requestMode === opt.value
             return (
@@ -62,24 +62,28 @@ export function ZoneA() {
                 title={opt.hint}
                 style={{
                   textAlign: 'left',
-                  background: active ? 'var(--surface3)' : 'var(--surface2)',
-                  border: `1px solid ${active ? 'var(--accent)' : 'var(--hairline2)'}`,
-                  borderRadius: 4,
-                  color: active ? 'var(--text)' : 'var(--text-dim)',
-                  padding: '7px 10px',
-                  fontSize: 12,
+                  background: active ? 'rgba(255,255,255,0.08)' : 'transparent',
+                  border: 'none',
+                  borderRadius: 6,
+                  color: active ? '#ffffff' : 'var(--text-dim)',
+                  padding: '8px 12px',
+                  fontSize: 13,
+                  fontWeight: active ? 500 : 400,
                   cursor: 'pointer',
                   fontFamily: 'inherit',
-                  transition: 'border-color 0.15s, color 0.15s',
+                  transition: 'background 0.12s, color 0.12s',
+                }}
+                onMouseEnter={e => {
+                  if (!active) e.currentTarget.style.background = 'rgba(255,255,255,0.04)'
+                }}
+                onMouseLeave={e => {
+                  if (!active) e.currentTarget.style.background = 'transparent'
                 }}
               >
                 {opt.label}
               </button>
             )
           })}
-        </div>
-        <div style={{ fontSize: 11, color: 'var(--text-muted)', marginTop: 5, lineHeight: 1.5 }}>
-          {MODE_OPTIONS.find(o => o.value === requestMode)?.hint}
         </div>
       </div>
 
@@ -122,14 +126,21 @@ export function ZoneA() {
             marginTop: 6,
             background: 'var(--surface2)',
             border: '1px solid var(--hairline2)',
-            borderRadius: 4,
+            borderRadius: 6,
             color: 'var(--text)',
-            padding: '7px 10px',
+            padding: '8px 12px',
             fontSize: 13,
             outline: 'none',
+            transition: 'border-color 0.15s, box-shadow 0.15s',
           }}
-          onFocus={e => (e.currentTarget.style.borderColor = 'var(--accent)')}
-          onBlurCapture={e => (e.currentTarget.style.borderColor = 'var(--hairline2)')}
+          onFocus={e => {
+            e.currentTarget.style.borderColor = 'var(--accent)'
+            e.currentTarget.style.boxShadow = '0 0 0 1px var(--accent)'
+          }}
+          onBlurCapture={e => {
+            e.currentTarget.style.borderColor = 'var(--hairline2)'
+            e.currentTarget.style.boxShadow = 'none'
+          }}
         />
       </div>
 

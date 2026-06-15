@@ -16,17 +16,13 @@ export function LoginScreen() {
 
   useEffect(() => { usernameRef.current?.focus() }, [])
 
-  // Apply theme on login screen too
+  // Always apply dark theme backgrounds on mount
   useEffect(() => {
     const root = document.documentElement
-    if (theme === 'light') root.setAttribute('data-theme', 'light')
-    else root.removeAttribute('data-theme')
-    requestAnimationFrame(() => {
-      const canvas = getComputedStyle(root).getPropertyValue('--canvas').trim()
-      root.style.background = canvas
-      document.body.style.background = canvas
-    })
-  }, [theme])
+    root.removeAttribute('data-theme')
+    root.style.background = '#000000'
+    document.body.style.background = '#000000'
+  }, [])
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault()
@@ -54,22 +50,7 @@ export function LoginScreen() {
       transition: 'background 0.2s',
     }}>
 
-      {/* Theme toggle — top right */}
-      <button
-        onClick={toggleTheme}
-        title={theme === 'dark' ? 'Light theme' : 'Dark theme'}
-        style={{
-          position: 'fixed', top: 20, right: 24,
-          background: 'none', border: '1px solid var(--hairline2)',
-          color: 'var(--text-dim)', borderRadius: 8, padding: '6px 12px',
-          fontSize: 13, cursor: 'pointer',
-          transition: 'border-color 0.15s, color 0.15s',
-        }}
-        onMouseEnter={e => { e.currentTarget.style.borderColor = 'var(--text-dim)'; e.currentTarget.style.color = 'var(--text)' }}
-        onMouseLeave={e => { e.currentTarget.style.borderColor = 'var(--hairline2)'; e.currentTarget.style.color = 'var(--text-dim)' }}
-      >
-        {theme === 'dark' ? '☀' : '☾'}
-      </button>
+
 
       <motion.div
         initial={{ opacity: 0, y: 16 }}

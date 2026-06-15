@@ -107,7 +107,7 @@ export function ZoneBGemini({ onGenerate }: { onGenerate: () => void }) {
     color: 'var(--text)',
     padding: '10px 12px',
     outline: 'none',
-    transition: 'border-color 0.15s',
+    transition: 'border-color 0.15s, box-shadow 0.15s',
   }
 
   return (
@@ -151,8 +151,18 @@ export function ZoneBGemini({ onGenerate }: { onGenerate: () => void }) {
         onChange={e => handleChange(e.target.value)}
         placeholder={'Paste Gemini JSON output here…\n\nAccepts raw JSON or ```json fences.\n\nExpected shape:\n{\n  "supplier": "...",\n  "items": [{\n    "raw_description": "...",\n    "brand": "...",\n    "product_name": "...",\n    "confidence": "high|medium|low",\n    "source": "..." // optional\n  }]\n}'}
         style={inputStyle}
-        onFocus={e => { if (!parseError) e.currentTarget.style.borderColor = 'var(--accent)' }}
-        onBlur={e => { if (!parseError) e.currentTarget.style.borderColor = 'var(--hairline2)' }}
+        onFocus={e => {
+          if (!parseError) {
+            e.currentTarget.style.borderColor = 'var(--accent)'
+            e.currentTarget.style.boxShadow = '0 0 0 1px var(--accent)'
+          }
+        }}
+        onBlur={e => {
+          if (!parseError) {
+            e.currentTarget.style.borderColor = 'var(--hairline2)'
+            e.currentTarget.style.boxShadow = 'none'
+          }
+        }}
         onKeyDown={e => {
           if ((e.metaKey || e.ctrlKey) && e.key === 'Enter') {
             e.preventDefault()

@@ -27,23 +27,13 @@ function MainApp() {
   const showToast  = useStore(s => s.showToast)
   const logout     = useStore(s => s.logout)
 
-  // Apply theme. We set both the attribute (so CSS vars cascade) and
-  // directly write background on html+body so the rule wins regardless
-  // of layer order with Tailwind preflight.
+  // Always apply dark theme backgrounds on mount
   useEffect(() => {
     const root = document.documentElement
-    if (theme === 'light') {
-      root.setAttribute('data-theme', 'light')
-    } else {
-      root.removeAttribute('data-theme')
-    }
-    // Resolve the current --canvas value after the attribute flip
-    requestAnimationFrame(() => {
-      const canvas = getComputedStyle(root).getPropertyValue('--canvas').trim()
-      root.style.background = canvas
-      document.body.style.background = canvas
-    })
-  }, [theme])
+    root.removeAttribute('data-theme')
+    root.style.background = '#000000'
+    document.body.style.background = '#000000'
+  }, [])
 
   // Restore generated state on mount
   useEffect(() => {
@@ -109,12 +99,7 @@ function MainApp() {
         </div>
 
         <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-          <HeaderBtn
-            onClick={toggleTheme}
-            title={theme === 'dark' ? 'Light theme' : 'Dark theme'}
-          >
-            {theme === 'dark' ? '○' : '●'}
-          </HeaderBtn>
+
           <HeaderBtn onClick={() => setSettingsOpen(true)} title="Brand Dictionary">
             Brand Dictionary
           </HeaderBtn>

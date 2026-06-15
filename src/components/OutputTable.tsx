@@ -133,19 +133,17 @@ export function OutputTable({ generated }: { generated: boolean }) {
         alignItems: 'center',
         justifyContent: 'center',
         flexDirection: 'column',
-        gap: 10,
-        color: 'var(--text-muted)',
+        gap: 12,
+        color: 'var(--text-dim)',
       }}>
-        <span style={{
-          fontFamily: 'Fraunces, serif',
-          fontSize: 32,
-          opacity: 0.18,
-          lineHeight: 1,
-        }}>⊞</span>
-        <span style={{ fontSize: 12.5, letterSpacing: '0.01em' }}>
+        <svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" style={{ opacity: 0.2, color: 'var(--text)' }}>
+          <rect width="18" height="18" x="3" y="3" rx="2" />
+          <path d="M3 9h18M3 15h18M9 3v18M15 3v18" />
+        </svg>
+        <span style={{ fontSize: 13, letterSpacing: '0.01em', fontWeight: 500 }}>
           Add brands and items, then hit Generate.
         </span>
-        <span style={{ fontSize: 11, opacity: 0.6 }}>⌘↵ to generate</span>
+        <span style={{ fontSize: 11, color: 'var(--text-muted)' }}>⌘↵ to generate</span>
       </div>
     )
   }

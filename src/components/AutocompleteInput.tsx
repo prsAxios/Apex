@@ -46,12 +46,13 @@ export function AutocompleteInput({ value, onChange, suggestions, placeholder, l
           width: '100%',
           background: 'var(--surface2)',
           border: `1px solid ${focused ? 'var(--accent)' : 'var(--hairline2)'}`,
-          borderRadius: 4,
+          borderRadius: 6,
           color: 'var(--text)',
-          padding: '7px 10px',
+          padding: '8px 12px',
           fontSize: 13,
           outline: 'none',
-          transition: 'border-color 0.15s',
+          transition: 'border-color 0.15s, box-shadow 0.15s',
+          boxShadow: focused ? '0 0 0 1px var(--accent)' : 'none',
         }}
       />
       {open && filtered.length > 0 && (
@@ -62,9 +63,9 @@ export function AutocompleteInput({ value, onChange, suggestions, placeholder, l
           right: 0,
           background: 'var(--surface3)',
           border: '1px solid var(--hairline2)',
-          borderRadius: 4,
+          borderRadius: 6,
           zIndex: 100,
-          boxShadow: '0 8px 24px rgba(0,0,0,0.4)',
+          boxShadow: '0 8px 30px rgba(0,0,0,0.6)',
           overflow: 'hidden',
         }}>
           {filtered.slice(0, 8).map(s => (
