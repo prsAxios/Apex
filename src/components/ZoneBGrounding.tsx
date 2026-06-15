@@ -53,38 +53,46 @@ export function ZoneBGrounding({ onGenerate }: { onGenerate: () => void }) {
     setStatusText('Initiating connection...')
 
     try {
-      setStatusText('Searching Google & grounding details...')
-      const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${geminiApiKey.trim()}`;
-      
-      const response = await fetch(url, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          contents: [
-            {
+      const makeRequest = async (modelName: string) => {
+        const url = `https://generativelanguage.googleapis.com/v1beta/models/${modelName}:generateContent?key=${geminiApiKey.trim()}`;
+        return fetch(url, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            contents: [
+              {
+                parts: [
+                  {
+                    text: `Ground and extract structured data from these descriptions. Perform search for verification:\n\n${rawText}`
+                  }
+                ]
+              }
+            ],
+            tools: [
+              {
+                googleSearch: {}
+              }
+            ],
+            systemInstruction: {
               parts: [
                 {
-                  text: `Ground and extract structured data from these descriptions. Perform search for verification:\n\n${rawText}`
+                  text: "You are a precise catalog parser for beverage/alcohol catalog support. Your task is to take raw item descriptions, perform a Google Search to ground and verify their details, and extract canonical brand name, clean product name, computed package size, confidence level, and search source URL. Return JSON conforming to: { \"items\": [ { \"raw_description\": string, \"brand\": string, \"product_name\": string, \"package_size\": string, \"confidence\": \"high\" | \"medium\" | \"low\", \"source\": string } ] }"
                 }
               ]
             }
-          ],
-          tools: [
-            {
-              googleSearch: {}
-            }
-          ],
-          systemInstruction: {
-            parts: [
-              {
-                text: "You are a precise catalog parser for beverage/alcohol catalog support. Your task is to take raw item descriptions, perform a Google Search to ground and verify their details, and extract canonical brand name, clean product name, computed package size, confidence level, and search source URL. Return JSON conforming to: { \"items\": [ { \"raw_description\": string, \"brand\": string, \"product_name\": string, \"package_size\": string, \"confidence\": \"high\" | \"medium\" | \"low\", \"source\": string } ] }"
-              }
-            ]
-          }
+          })
         })
-      })
+      }
+
+      setStatusText('Searching Google & grounding details (gemini-2.5-flash)...')
+      let response = await makeRequest('gemini-2.5-flash')
+      
+      if (!response.ok && (response.status === 503 || response.status === 429)) {
+        setStatusText('gemini-2.5-flash overloaded, trying gemini-1.5-flash fallback...')
+        response = await makeRequest('gemini-1.5-flash')
+      }
 
       if (!response.ok) {
         const errorData = await response.json().catch(() => ({}))
