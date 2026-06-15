@@ -10,6 +10,8 @@ export function SettingsDrawer() {
   const deleteDictEntry = useStore(s => s.deleteDictEntry)
   const setDictionary = useStore(s => s.setDictionary)
   const showToast = useStore(s => s.showToast)
+  const geminiApiKey = useStore(s => s.geminiApiKey)
+  const setGeminiApiKey = useStore(s => s.setGeminiApiKey)
   const fileRef = useRef<HTMLInputElement>(null)
 
   const entries = Object.entries(dictionary).sort((a, b) => a[0].localeCompare(b[0]))
@@ -63,16 +65,49 @@ export function SettingsDrawer() {
             }}
           >
             <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-              <div className="zone-label">Brand Dictionary</div>
+              <div className="zone-label">Settings</div>
               <button
                 onClick={() => setOpen(false)}
                 style={{ background: 'none', border: 'none', color: 'var(--text-dim)', fontSize: 18, cursor: 'pointer', padding: 0 }}
               >×</button>
             </div>
 
-            <div style={{ fontSize: 12, color: 'var(--text-dim)', lineHeight: 1.6 }}>
-              Aliases that auto-resolve to canonical brand names. Every manual brand edit teaches this dictionary.
+            {/* Gemini API Key Configuration */}
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 8, borderBottom: '1px solid var(--hairline)', paddingBottom: 16 }}>
+              <label style={{ fontSize: 10, fontWeight: 600, color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.05em' }}>
+                Gemini API Configuration
+              </label>
+              <input
+                type="password"
+                placeholder="AIzaSy... (Gemini API Key)"
+                value={geminiApiKey}
+                onChange={e => setGeminiApiKey(e.target.value)}
+                style={{
+                  width: '100%',
+                  background: 'var(--surface2)',
+                  border: '1px solid var(--hairline2)',
+                  borderRadius: 6,
+                  color: 'var(--text)',
+                  padding: '8px 12px',
+                  fontSize: 13,
+                  outline: 'none',
+                }}
+                onFocus={e => (e.currentTarget.style.borderColor = 'var(--accent)')}
+                onBlur={e => (e.currentTarget.style.borderColor = 'var(--hairline2)')}
+              />
+              <div style={{ fontSize: 11, color: 'var(--text-muted)', lineHeight: 1.4 }}>
+                Used client-side for active Google Search grounding features. Get keys from Google AI Studio.
+              </div>
             </div>
+
+            {/* Brand Dictionary */}
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 6, flex: 1, minHeight: 0 }}>
+              <label style={{ fontSize: 10, fontWeight: 600, color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.05em' }}>
+                Brand Dictionary
+              </label>
+              <div style={{ fontSize: 11, color: 'var(--text-dim)', lineHeight: 1.5, marginBottom: 4 }}>
+                Aliases that auto-resolve to canonical brand names. Every manual brand edit teaches this dictionary.
+              </div>
 
             <div style={{ flex: 1, overflowY: 'auto', display: 'flex', flexDirection: 'column', gap: 2 }}>
               {entries.map(([alias, canonical]) => (
@@ -136,7 +171,8 @@ export function SettingsDrawer() {
               </button>
               <input ref={fileRef} type="file" accept=".json" style={{ display: 'none' }} onChange={handleImport} />
             </div>
-          </motion.div>
+          </div>
+        </motion.div>
         </>
       )}
     </AnimatePresence>

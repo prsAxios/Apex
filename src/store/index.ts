@@ -43,8 +43,15 @@ export interface AppState {
   dictionary: BrandDictionary
 
   // Zone B mode
-  zoneBMode: 'smart' | 'gemini'
+  zoneBMode: 'smart' | 'gemini' | 'grounding'
   geminiRawJson: string
+
+  // Gemini API and token tracking
+  geminiApiKey: string
+  lastTokenUsage: { prompt: number; candidates: number; total: number } | null
+  lifetimeTokensUsed: number
+  dailyTokenUsage: number
+  lastUsageResetDate: string
 
   // Toast
   toast: { message: string; type: 'success' | 'error' | 'info' } | null
@@ -85,8 +92,12 @@ export interface AppState {
   moveRowUp: (brandId: string, rowIndex: number) => void
   moveRowDown: (brandId: string, rowIndex: number) => void
 
-  setZoneBMode: (m: 'smart' | 'gemini') => void
+  setZoneBMode: (m: 'smart' | 'gemini' | 'grounding') => void
   setGeminiRawJson: (v: string) => void
+
+  setGeminiApiKey: (key: string) => void
+  addTokenUsage: (prompt: number, candidates: number) => void
+  clearTokenUsage: () => void
 
   teachWord: (alias: string, canonical: string) => void
   deleteDictEntry: (alias: string) => void
@@ -121,6 +132,12 @@ export const useStore = create<AppState>()(
 
       zoneBMode: 'smart' as const,
       geminiRawJson: '',
+
+      geminiApiKey: '',
+      lastTokenUsage: null,
+      lifetimeTokensUsed: 0,
+      dailyTokenUsage: 0,
+      lastUsageResetDate: new Date().toDateString(),
 
       emailOpening: 'Hi Team,',
       emailBodyText: '',
@@ -235,6 +252,26 @@ export const useStore = create<AppState>()(
       setZoneBMode: (m) => set({ zoneBMode: m }),
       setGeminiRawJson: (v) => set({ geminiRawJson: v }),
 
+      setGeminiApiKey: (key) => set({ geminiApiKey: key }),
+      addTokenUsage: (prompt, candidates) => {
+        const todayStr = new Date().toDateString()
+        const currentResetDate = get().lastUsageResetDate
+        let dailyUsage = get().dailyTokenUsage
+        
+        if (currentResetDate !== todayStr) {
+          dailyUsage = 0
+        }
+        
+        const added = prompt + candidates
+        set({
+          lastTokenUsage: { prompt, candidates, total: added },
+          lifetimeTokensUsed: get().lifetimeTokensUsed + added,
+          dailyTokenUsage: dailyUsage + added,
+          lastUsageResetDate: todayStr
+        })
+      },
+      clearTokenUsage: () => set({ lastTokenUsage: null }),
+
       teachWord: (alias, canonical) => {
         const next = teachDictionary(alias, canonical, get().dictionary)
         set({ dictionary: next })
@@ -274,6 +311,11 @@ export const useStore = create<AppState>()(
         emailBodyText: s.emailBodyText,
         emailClosing: s.emailClosing,
         signature: s.signature,
+        geminiApiKey: s.geminiApiKey,
+        lastTokenUsage: s.lastTokenUsage,
+        lifetimeTokensUsed: s.lifetimeTokensUsed,
+        dailyTokenUsage: s.dailyTokenUsage,
+        lastUsageResetDate: s.lastUsageResetDate,
       }),
     }
   )

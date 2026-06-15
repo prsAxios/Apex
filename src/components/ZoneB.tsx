@@ -3,6 +3,7 @@ import { motion, AnimatePresence } from 'framer-motion'
 import { useStore } from '../store'
 import { AutocompleteInput } from './AutocompleteInput'
 import { ZoneBGemini } from './ZoneBGemini'
+import { ZoneBGrounding } from './ZoneBGrounding'
 import { parseLines, parseBulkPaste } from '../parser'
 import { fuzzyResolveAlias } from '../dictionary'
 
@@ -77,12 +78,12 @@ export function ZoneB({ onGenerate }: { onGenerate: () => void }) {
       <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
         <div className="zone-label">Items Input</div>
         <div style={{
-          display: 'grid', gridTemplateColumns: '1fr 1fr',
+          display: 'grid', gridTemplateColumns: '1fr 1fr 1.2fr',
           background: 'var(--surface2)',
           border: '1px solid var(--hairline2)',
           borderRadius: 8, padding: 3, gap: 3,
         }}>
-          {(['smart', 'gemini'] as const).map(m => (
+          {(['smart', 'gemini', 'grounding'] as const).map(m => (
             <button
               key={m}
               onClick={() => setZoneBMode(m)}
@@ -90,13 +91,13 @@ export function ZoneB({ onGenerate }: { onGenerate: () => void }) {
                 background: zoneBMode === m ? 'var(--accent)' : 'none',
                 color: zoneBMode === m ? 'var(--accent-contrast)' : 'var(--text-dim)',
                 border: 'none', borderRadius: 5,
-                padding: '6px 10px', fontSize: 12, fontWeight: 600,
+                padding: '6px 8px', fontSize: 11.5, fontWeight: 600,
                 cursor: 'pointer', fontFamily: 'inherit',
                 transition: 'background 0.15s, color 0.15s',
                 letterSpacing: '0.01em',
               }}
             >
-              {m === 'smart' ? 'Smart Builder' : 'JSON + Gemini AI'}
+              {m === 'smart' ? 'Smart' : m === 'gemini' ? 'JSON' : 'Live Search'}
             </button>
           ))}
         </div>
@@ -105,6 +106,11 @@ export function ZoneB({ onGenerate }: { onGenerate: () => void }) {
       {/* ── Gemini mode ────────────────────────────────────────────────── */}
       {zoneBMode === 'gemini' && (
         <ZoneBGemini onGenerate={onGenerate} />
+      )}
+
+      {/* ── Grounding mode ─────────────────────────────────────────────── */}
+      {zoneBMode === 'grounding' && (
+        <ZoneBGrounding onGenerate={onGenerate} />
       )}
 
       {/* ── Smart Builder mode ─────────────────────────────────────────── */}
